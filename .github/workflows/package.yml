@@ -1,12 +1,10 @@
 name: Package AuthSurvey
 
 on:
+  pull_request:
   push:
     tags:
       - 'v*.*.*'
-  pull_request:
-    branches:
-      - master
 
 permissions:
   contents: write
@@ -14,31 +12,39 @@ permissions:
 jobs:
   package:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install zip
-        run: sudo apt-get update && sudo apt-get install -y zip
+      - name: Install zip and rsync
+        run: sudo apt-get update && sudo apt-get install -y zip rsync
+
+      - name: Set package version
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "version=${GITHUB_REF_NAME}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "version=run-${GITHUB_RUN_ID}" >> "${GITHUB_OUTPUT}"
+          fi
 
       - name: Package plugin
         env:
-          VERSION: ${{ github.ref_name }}
-        run: |
-          mkdir -p dist
-          bash scripts/package.sh dist
-
-      - name: List generated files
-        run: ls -lah dist
+          VERSION: ${{ steps.meta.outputs.version }}
+          PACKAGE_DIR_NAME: AuthSurvey
+        run: bash scripts/package.sh
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AuthSurvey-${{ github.ref_name }}
+          name: AuthSurvey-${{ steps.meta.outputs.version }}
           path: dist/*.zip
           if-no-files-found: error
 
       - name: Create GitHub release and upload zip
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.zip

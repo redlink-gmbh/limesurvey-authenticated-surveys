@@ -4,41 +4,55 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-PLUGIN_DIR_NAME="${PLUGIN_DIR_NAME:-AuthSurvey}"
-PLUGIN_DIR="${PLUGIN_DIR:-${REPO_ROOT}/${PLUGIN_DIR_NAME}}"
-OUTPUT_DIR="${1:-${REPO_ROOT}/dist}"
-VERSION="${VERSION:-}"
+# Source files of the plugin.
+# Default: repository root contains the plugin files.
+SOURCE_DIR="${SOURCE_DIR:-${REPO_ROOT}}"
 
-if [[ ! -d "${PLUGIN_DIR}" ]]; then
-  echo "Plugin directory not found: ${PLUGIN_DIR}" >&2
-  exit 1
-fi
+# Folder name inside the zip.
+PACKAGE_DIR_NAME="${PACKAGE_DIR_NAME:-AuthSurvey}"
+
+# Output dir, default: <repo>/dist
+OUTPUT_DIR="${1:-${REPO_ROOT}/dist}"
+
+RAW_VERSION="${VERSION:-${GITHUB_REF_NAME:-}}"
+SAFE_VERSION="$(printf '%s' "${RAW_VERSION}" | tr '/[:space:]' '-' | tr -cd '[:alnum:]._-')"
 
 mkdir -p "${OUTPUT_DIR}"
 
-if [[ -n "${VERSION}" ]]; then
-  ZIP_NAME="${PLUGIN_DIR_NAME}-${VERSION}.zip"
+if [[ -n "${SAFE_VERSION}" ]]; then
+  ZIP_NAME="${PACKAGE_DIR_NAME}-${SAFE_VERSION}.zip"
 else
-  ZIP_NAME="${PLUGIN_DIR_NAME}.zip"
+  ZIP_NAME="${PACKAGE_DIR_NAME}.zip"
 fi
 
-ZIP_PATH="${OUTPUT_DIR}/${ZIP_NAME}"
+ZIP_PATH="$(cd "${OUTPUT_DIR}" && pwd)/${ZIP_NAME}"
+STAGING_DIR="$(mktemp -d)"
+PACKAGE_ROOT="${STAGING_DIR}/${PACKAGE_DIR_NAME}"
+
+cleanup() {
+  rm -rf "${STAGING_DIR}"
+}
+trap cleanup EXIT
+
+mkdir -p "${PACKAGE_ROOT}"
+
+rsync -a \
+  --exclude '.git' \
+  --exclude '.github' \
+  --exclude 'dist' \
+  --exclude 'scripts' \
+  --exclude '.idea' \
+  --exclude '.DS_Store' \
+  --exclude 'node_modules' \
+  --exclude 'vendor' \
+  --exclude 'tests' \
+  "${SOURCE_DIR}/" "${PACKAGE_ROOT}/"
 
 rm -f "${ZIP_PATH}"
 
-PARENT_DIR="$(dirname "${PLUGIN_DIR}")"
-BASENAME="$(basename "${PLUGIN_DIR}")"
-
 (
-  cd "${PARENT_DIR}"
-  zip -r "${ZIP_PATH}" "${BASENAME}" \
-    -x "${BASENAME}/.git/*" \
-    -x "${BASENAME}/.github/*" \
-    -x "${BASENAME}/dist/*" \
-    -x "${BASENAME}/node_modules/*" \
-    -x "${BASENAME}/vendor/bin/*" \
-    -x "${BASENAME}/tests/*" \
-    -x "${BASENAME}/.DS_Store"
+  cd "${STAGING_DIR}"
+  zip -r "${ZIP_PATH}" "${PACKAGE_DIR_NAME}"
 )
 
 echo "Created package: ${ZIP_PATH}"
