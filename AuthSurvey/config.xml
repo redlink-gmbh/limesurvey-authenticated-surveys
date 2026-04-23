@@ -14,7 +14,7 @@
             This plugin forces selected surveys to be displayed/submitted only to/by authenticated users
         </description>
         <compatibility>
-            <ls>6.0</ls>
+            <ls>6</ls>
         </compatibility>
     </metadata>
 </config>
