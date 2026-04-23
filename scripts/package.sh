@@ -5,17 +5,22 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Source files of the plugin.
-# Default: repository root contains the plugin files.
-SOURCE_DIR="${SOURCE_DIR:-${REPO_ROOT}}"
+# Default: <repo>/AuthSurvey
+SOURCE_DIR="${1:-${SOURCE_DIR:-${REPO_ROOT}/AuthSurvey}}"
 
 # Folder name inside the zip.
 PACKAGE_DIR_NAME="${PACKAGE_DIR_NAME:-AuthSurvey}"
 
 # Output dir, default: <repo>/dist
-OUTPUT_DIR="${1:-${REPO_ROOT}/dist}"
+OUTPUT_DIR="${2:-${OUTPUT_DIR:-${REPO_ROOT}/dist}}"
 
 RAW_VERSION="${VERSION:-${GITHUB_REF_NAME:-}}"
 SAFE_VERSION="$(printf '%s' "${RAW_VERSION}" | tr '/[:space:]' '-' | tr -cd '[:alnum:]._-')"
+
+if [[ ! -d "${SOURCE_DIR}" ]]; then
+  echo "Source directory not found: ${SOURCE_DIR}" >&2
+  exit 1
+fi
 
 mkdir -p "${OUTPUT_DIR}"
 

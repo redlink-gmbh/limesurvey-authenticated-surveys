@@ -34,7 +34,7 @@ jobs:
         env:
           VERSION: ${{ steps.meta.outputs.version }}
           PACKAGE_DIR_NAME: AuthSurvey
-        run: bash scripts/package.sh
+        run: bash scripts/package.sh "${{ github.workspace }}/AuthSurvey" "${{ github.workspace }}/dist"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
