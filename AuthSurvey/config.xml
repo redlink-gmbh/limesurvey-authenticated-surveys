@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+    <metadata>
+        <name>AuthSurvey</name>
+        <type>plugin</type>
+        <creationDate>2024-01-01</creationDate>
+        <lastUpdate>2024-01-01</lastUpdate>
+        <author>Panagiotis Karatakis</author>
+        <authorUrl>https://github.com/auth-it-center</authorUrl>
+        <license>GPL-3.0</license>
+        <version>1.0.0</version>
+        <description>
+            This plugin forces selected surveys to be displayed/submitted only to/by authenticated users
+        </description>
+        <compatibility>
+            <ls>6.0</ls>
+        </compatibility>
+    </metadata>
+</config>
