@@ -9,6 +9,7 @@ Every survey can have a different configuration/policy.
 2. Go to **Admin > Configuration > Plugin Manager** or **https:/example.com/index.php/admin/pluginmanager/sa/index**
 and **Enable** the plugin
 ![Plugin manager with AuthSurveys Enabled](images/plugin_manager.png)
+3. Also update the user permissions. As this plugin needs a special permission to be set, please gp to **Configuration > User/User Roles > Select a User/Role > Edit permissions > toggle "Allow user to save plugin settings" on**
 
 ## How to enable plugin for specific survey
   1. Go to **Surveys > (Select desired survey) > Simple Plugins** or
