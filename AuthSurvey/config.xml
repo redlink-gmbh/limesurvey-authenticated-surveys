@@ -5,11 +5,11 @@
         <name>AuthSurvey</name>
         <type>plugin</type>
         <creationDate>2024-01-01</creationDate>
-        <lastUpdate>2024-01-01</lastUpdate>
+        <lastUpdate>2026-05-06</lastUpdate>
         <author>Panagiotis Karatakis</author>
         <authorUrl>https://github.com/auth-it-center</authorUrl>
         <license>GPL-3.0</license>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <description>
             This plugin forces selected surveys to be displayed/submitted only to/by authenticated users
         </description>
