@@ -27,3 +27,11 @@ This is how the plugin settings look for a specific survey.
 This is what an unauthorized user sees when they try to view/submit a survey that is protected by the plugin.
 
 ![Unauthorized Error image](images/unauthorized.png)
+
+## Auth Redirect Extension
+
+Unauthenticated users can optionally be redirected to the admin login instead of seeing a 401 error. After logging in, they are automatically returned to the original survey URL — including the participant token.
+
+Configure it per survey under **Surveys > (Select survey) > Simple Plugins > AuthSurvey** by enabling both **Enabled** and **Redirect to login**.
+
+See the [Auth Redirect Extension](docs/AuthRedirectExtension.md) for full details.

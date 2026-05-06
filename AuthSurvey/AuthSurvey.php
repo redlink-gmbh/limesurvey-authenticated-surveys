@@ -46,7 +46,14 @@ class AuthSurvey extends Limesurvey\PluginManager\PluginBase
                         'help' => 'Only authenticated users should see the survey ?',
                         'default' => false,
                         'current' => $current,
-                    ]
+                    ],
+                    'redirect_on_unauthenticated' => [
+                        'type'    => 'checkbox',
+                        'label'   => 'Redirect to login',
+                        'help'    => 'Redirect unauthenticated users to the admin login instead of showing a 401 error.',
+                        'default' => false,
+                        'current' => $this->get('redirect_on_unauthenticated', 'Survey', $event->get('survey')),
+                    ],
                 ]
             ]);
         }
@@ -67,9 +74,12 @@ class AuthSurvey extends Limesurvey\PluginManager\PluginBase
         $event = $this->event;
         $id = $event->get('surveyId');
         $flag = $this->get('auth_protection_enabled', 'Survey', $id);
-        if ($flag) {
-            // Check if user is authenticated
-            if (is_null(Yii::app()->user->getId())) {
+
+        if ($flag && is_null(Yii::app()->user->getId())) {
+            if ($this->get('redirect_on_unauthenticated', 'Survey', $id)) {
+                Yii::app()->user->setReturnUrl(Yii::app()->request->requestUri);
+                Yii::app()->getController()->redirect(array('/admin/authentication/sa/login'));
+            } else {
                 throw new CHttpException(401, gT("We are sorry but you do not have permissions to do this."));
             }
         }
